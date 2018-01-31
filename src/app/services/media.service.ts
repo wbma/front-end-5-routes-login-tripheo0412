@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
+import {Router} from '@angular/router';
 
 @Injectable()
 export class MediaService {
@@ -10,7 +11,7 @@ export class MediaService {
   data: any;
   baseurl = 'http://media.mw.metropolia.fi/wbma/';
 
-  constructor(public http: HttpClient) { }
+  constructor(public http: HttpClient, private router: Router) { }
 
   public register() {
     this.data = `{
@@ -20,8 +21,11 @@ export class MediaService {
     }`;
 
     const header = new HttpHeaders().set('Content-Type', 'application/json ');
-    this.http.post(this.baseurl + 'users', this.data, {headers: header}).subscribe(data =>{console.log(data);});
-    return this.http.post(this.baseurl + 'users', this.data, {headers: header});
+    this.http.post(this.baseurl + 'users', this.data, {headers: header}).subscribe(data => {
+      console.log(data);
+    }, (error: HttpErrorResponse) => {
+      console.log(error.error.message);
+    });
   }
 
   public login() {
@@ -32,9 +36,21 @@ export class MediaService {
   };
 
     const header = new HttpHeaders().set('Content-Type', 'application/json ');
-    return this.http.post(this.baseurl + 'login', this.data, {headers: header}).subscribe(ata => {console.log(ata);});
+    this.http.post(this.baseurl + 'login', this.data, {headers: header}).subscribe(ata => {
+      console.log(ata);
+      localStorage.setItem('token', ata['token']);
+      this.router.navigate(['front']);
+    }, (error: HttpErrorResponse) => {
+      console.log(error.error.message);
+    });
   }
-
+   getUserData() {
+    const settings = {
+      headers: new HttpHeaders().set('x-access-token',
+        localStorage.getItem('token'))
+    };
+   return this.http.get(this.baseurl + 'users/user', settings);
+   }
 
 
 }
