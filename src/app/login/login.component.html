@@ -1,0 +1,12 @@
+<form >
+  <div class="container">
+    <label><b>Username</b></label>
+    <input [(ngModel)] = "mediaService.Username" [ngModelOptions]="{standalone: true}">
+    <br>
+
+    <label><b>Password</b></label>
+    <input [(ngModel)]="mediaService.Password" [ngModelOptions]="{standalone: true}">
+
+    <button (click)="mediaService.login()">Login</button>
+  </div>
+</form>
